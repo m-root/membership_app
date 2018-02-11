@@ -1,0 +1,135 @@
+{% extends 'web/layout.html' %}
+{% load staticfiles %}
+{% block content %}
+
+
+      <header class="header header-inverse">
+        <div class="container">
+          <div class="header-info">
+            <div class="left">
+              <br>
+              <h2 class="header-title"><strong>Users</strong> <small class="subtitle">You can see list of all users in this page. Use action buttons to create a new user.</small></h2>
+            </div>
+          </div>
+
+          <div class="header-action">
+            <nav class="nav">
+              <a class="nav-link " href="{% url 'core:users' %}">Users</a>
+              <a class="nav-link active" href="{% url 'core:new_user' %}">Add new user</a>
+            </nav>
+
+
+          </div>
+        </div>
+      </header><!--/.header -->
+
+
+
+
+<div class="main-content">
+    <div class="container">
+        <form class="row" method="post" >
+            {% csrf_token %}
+
+                    <div>
+
+             {% if form.errors %}
+                <p>{{ form.errors }}</p>
+            {% endif %}
+
+            <div class="col-md-7 col-xl-8">
+                <div class="card shadow-1">
+                    <h4 class="card-title"><strong>New User</strong> Registration</h4>
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="full_name" class="require">Full Name</label>
+                                <input class="form-control" type="text" id="full_name" name="full_name">
+                            </div>
+
+{#                            <div class="form-group col-md-6">#}
+{#                                <label class="require">Last Name</label>#}
+{#                                <input class="form-control" type="text" name="slug">#}
+{#                                <!--<small>String to be use in URL</small>-->#}
+{#                            </div>#}
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label class="require">Email Address</label>
+                                <input class="form-control" type="email" name="email">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label class="require">User Group</label>
+                                <select class="form-control" data-provide="selectpicker" name="account_type">
+                                    <option value="2">Mini Coach</option>
+                                    <option value="3">Program Head</option>
+                                    <option value="4">M & E</option>
+                                    <option value="5">Management</option>
+                                </select>
+                            </div>
+
+                            <!--<div class="row">-->
+                            <div class="form-group col-md-6">
+                                <label class="require">Primary Number</label>
+                                <input class="form-control" type="text" name="name">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label class="require">Secondary Number</label>
+                                <input class="form-control" type="text" name="slug">
+                                <!--<small>String to be use in URL</small>-->
+                            </div>
+                            <!--</div>-->
+
+                            <!--<div class="row">-->
+                            <div class="form-group col-md-6">
+                                <label class="require">Home Address</label>
+                                <input class="form-control" type="text" name="name">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label class="require">Area of Residence</label>
+                                <input class="form-control" type="text" name="slug">
+                                <!--<small>String to be use in URL</small>-->
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" name="password1" id="password1">
+
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="password">Repeat Password</label>
+                                <input type="password" class="form-control" name="password2" id="password2">
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <!----------------------------------------------------------------------------->
+
+                    </div>
+
+                    <footer class="card-footer text-right">
+                        <a class="btn btn-secondary mr-2" href="#">Cancel</a>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </footer>
+
+                </div>
+            </div>
+            <!--</div>-->
+
+
+
+    </form>
+</div>
+</div>
+
+
+
+{% endblock %}
