@@ -1,0 +1,36 @@
+{% extends 'web/layout.html' %}
+{% load staticfiles %}
+
+
+{% block content %}
+{% block header %}
+    <header class="header header-inverse">
+    <div class="container">
+        <div class="header-info">
+            <div class="left">
+                <br>
+                <h2 class="header-title"><strong>SMS</strong> <small class="subtitle">You can create SMS' & Contacts in this page. Use action buttons to make change to them.</small></h2>
+            </div>
+        </div>
+
+        <div class="header-action">
+            <nav class="nav">
+                <a class="nav-link active " href="{% url 'sms:index' %}">Contacts</a>
+                <a class="nav-link  " href="{% url 'sms:index' %}">Contacts</a>
+                <a class="nav-link  " href="{% url 'sms:index' %}">New Contact</a>
+                <a class="nav-link  " href="{% url 'sms:index' %}">Groups</a>
+                <a class="nav-link  " href="{% url 'sms:index' %}">SMS</a>
+                <a class="nav-link  " href="{% url 'sms:index' %}">SMS History</a>
+                <div class="buttons">
+                    <a class="btn btn-primary btn-float" href="{% url 'sms:contacts_create' %}" title="Add a new member" data-provide="tooltip"><i class="ti-plus"></i></a>
+                </div>
+
+            </nav>
+
+        </div>
+    </div>
+</header>
+<!--/.header -->
+{% endblock %}
+
+{% endblock %}
