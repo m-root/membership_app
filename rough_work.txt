@@ -1,0 +1,103 @@
+# Challenge
+
+A Company X requires to recollect their employees data in soft copy. All the records it has now are in physical copies and some data is either missing or is expired. You as the Company developer have been tasked with coming up with a system that will allow the employees to register using their employee number and submit their data. Since the company has many employees, each employee data should be approved by One or more persons who personally know the employee.
+
+There should also be an admin section on the site where reporting, verification and tracking of the collected details can be done.
+
+## Requirements
+
+Design a system that allows for employee data collection. When an employee registers on the system, they should get an email link to verify their account. Upon verification, they are taken to a dashboard.
+
+They can then add their details and update or delete in case of any issue.
+Upon adding their data (including an SMS number of the verifier), an SMS should be sent to the verifier with a shortened link to the data that the employee has added so they can confirm whether it is genuine.
+
+There should be a separate user type with admin permission and a different dashboard to do admin functions such as check the data added by the employees and export the data when needed.
+
+Writing tests for the application is highly encouraged. If possible, please intergrate CI/CD to your solution with your tool of choice.
+
+Finally, include deployment configurations to your project. Ensure your project can run and include configurations and descriptions on how your project can be deployed in a production environment.
+
+*Partial solutions will be considered.*
+
+#### Recommendations
+- Languages: Python/Golang
+- URL Shortener: Google URL shortener
+- SMS Sending API: Africastalking API
+- Database: Postgresql/MySQL
+
+## Data Models
+#### Employees Section
+*Register/Login to the system*
+
+- Full Names
+- Username
+- Email
+- Password
+
+*Dashboard*
+
+- Summary data
+- Links for navigation
+- Anything you see fit for Employee Dashboard
+
+*Employee data*
+
+Add/remove/update/view employee (his/her own) details
+- Employee number
+- Tax PIN
+- Date Hired
+- ID Number
+- ID scanned copy (File)
+- Verifier Phone number (SMS Will be sent here)
+
+*Verifier*
+Gets to the system through the shortened link from the SMS, views the specific data and confirms whether its genuine or not. He can add his own comments.
+- Details to verify
+- Confirm/Unconfirm the data
+- Comment
+
+#### Admin Section
+Add/remove/update/view all employee details
+Export employee data (to Excel and or PDF)
+
+*Register/Login (and addition of other Admins)*
+
+- Names
+- Email
+- Password
+- Username
+
+*Dashboard*
+
+- Summary data
+- Links for navigation
+- Anything you see fit for Admin Dashboard
+
+## Documentation:
+Please modify `README.md` to add:
+- Instructions on how to build/run your application
+- A paragraph or two about what you are particularly proud of in your implementation, and why.
+
+## Challenge scope
+- High level description of design and technologies used
+- Document all assumptions made
+- Complete solutions aren't required, but what you do submit needs to run.
+
+## How to complete this challenge
+- Complete the design and code as defined to the best of your abilities
+- Place notes in your code to help with clarity where appropriate. Make it readable enough to present to the Focus Mobile interview team
+- Complete your work in your own github/bitbucket repo and send the link to jobs@focusmobile.co
+
+## Assumptions you make given limited requirements
+- Technology and design choices
+- Identify areas of your strengths
+- This is not a pass or fail test, this will serve as a common ground that we can deep dive together into specific issues
+
+## Evaluation
+Evaluation of your submission will be based on the following criteria.
+- Did you follow the instructions for submission?
+- Did you document your build/deploy instructions and your explanation of what you did well?
+- Were models/entities and other components easily identifiable to the reviewer?
+- What design decisions did you make when designing your models/entities? Why (i.e. were they explained?)
+- Did you separate any concerns in your application? Why or why not?
+- Does your solution use appropriate data types for the problem as described?
