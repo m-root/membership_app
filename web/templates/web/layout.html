@@ -1,0 +1,25 @@
+{% extends 'web/base.html' %}
+{#{% block title %}My page title{% endblock %}#}
+{% load staticfiles %}
+
+{% block app %}
+
+    <!-- Topbar -->
+   {% include 'partials/_header.html' %}
+    <!-- END Topbar -->
+
+    <!-- Main container -->
+    <main class="bodyfont">
+        {% block content %}
+        {% endblock %}
+      <!-- Footer -->
+
+    {% include 'partials/_footer.html' %}
+
+      <!-- END Footer -->
+
+    </main>
+
+
+
+{% endblock %}
