@@ -26,8 +26,6 @@ from web import views as web
 urlpatterns = [
     url(r'^', include('core.urls')),
 
-    url(r'^core/', include('core.urls', namespace='core')),
-
 ]
 
 # serve static and media files in development
