@@ -1,33 +1,35 @@
 import logging
 from django.contrib.auth.decorators import login_required
-from core.models import Account
+from core.models import Account, Profile
 import json
 import requests
 from africastalking.AfricasTalkingGateway import AfricasTalkingGateway, AfricasTalkingGatewayException
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic import FormView, RedirectView
-from django.urls import reverse
+from django.views.generic import FormView, RedirectView, DetailView
+from django.urls import reverse, reverse_lazy
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.tokens import default_token_generator
-from .forms import AccountForm
-from django.http import HttpResponse
+# from .forms import AccountForm
+from django.http import HttpResponse, request, HttpResponseRedirect, Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
+from .forms import SignUpForm,  UpdateProfile
+from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
-
-
-# Create your views here.
 log = logging.getLogger(__name__)
 
 
@@ -124,39 +126,7 @@ class LoginView(FormView):
             redirect_to = self.success_url
         return redirect_to
 
-###########################################################
-# REGISTRATION VIEW
-###########################################################
-class RegisterView(FormView):
-    """
-    Provides the ability to register user with a username and password
-    """
-    template_name = 'core/register.html'
-    success_url = '/account_activation_sent/'
-    form_class = AccountForm
-    redirect_field_name = REDIRECT_FIELD_NAME
 
-    @method_decorator(sensitive_post_parameters('password', 'password2'))
-    @method_decorator(csrf_protect)
-    @method_decorator(ensure_csrf_cookie)
-    @method_decorator(never_cache)
-    def dispatch(self, request, *args, **kwargs):
-        # Sets a test cookie to make sure the user has cookies enabled
-        # request.session.set_test_cookie()
-        # log.info("Test Cookie Set")
-        return super(RegisterView, self).dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        user = form.save()
-        # auth_login(self.request, user)
-
-        return super(RegisterView, self).form_valid(form)
-
-    def get_success_url(self):
-        redirect_to = self.request.GET.get(self.redirect_field_name)
-        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
-            redirect_to = self.success_url
-        return redirect_to
 
 ###########################################################
 # LOGOUT VIEW
@@ -201,11 +171,11 @@ def get_google_api_key():
 
 
 
-
-f = send_account_activation_email()
-# url = send_account_activation_email.
-# x = url
-message_for_all='Hello\n\nThank you for signing up. Please verify your Account using the link below \n \n' + send_account_activation_email()
+#
+# f = send_account_activation_email()
+# # url = send_account_activation_email.
+# # x = url
+# message_for_all='Hello\n\nThank you for signing up. Please verify your Account using the link below \n \n' + send_account_activation_email()
 
 ###########################################################
 # URL SHORTENING BY
@@ -231,7 +201,8 @@ def send_sms():
     apikey = get_api_key()
     to = "+254712160428"
 
-    message = message_for_all
+    message = ''
+    # message = message_for_all
     gateway = AfricasTalkingGateway(username, apikey)
 
     try:
@@ -263,35 +234,51 @@ def member_list(request):
     return render(request, '', context)
 
 ###########################################################
+# INDEX VIEW
+###########################################################
+
+# if Account.ACCESS_LEVELS == 1:
+@login_required
+def index(request):
+    if not Account.is_staff:
+        return render(request,'web/index.html')
+    else:
+        return render(request,'core/member_details.html')
+
+
+###########################################################
 # CREATING A MEMBER
 ###########################################################
 
 def create_member(request):
     context = {}
     if request.method == "POST":
-        form = AccountForm(data=request.POST)
+        form = SignUpForm(data=request.POST)
         if form.is_valid():
             form.save() #TODO: Redirect and template
             return redirect('core/daycare/list/')
     else:
-        form = AccountForm()
+        form = SignUpForm()
     return render(request,'core/daycare/daycare_create.html', context)
 
 
 
-###########################################################
+##########################################member#################
 # UPDATING A MEMBER
 ###########################################################
 
 @login_required
-def member_update(request, pk):
-    book= get_object_or_404(Account, pk=pk)
-    form = AccountForm(request.POST or None, instance=book)
-    context = {}
-    if form.is_valid():
-        form.save()
-        return redirect('books_fbv:book_list')
-    return render(request, '', context)
+def member_edit(self, *args, **kwargs):
+    user = get_object_or_404(User, pk=self.kwargs['pk'])
+
+    if request.method == 'POST':
+        form = UpdateProfile(request.POST or None, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+    else:
+        form = UpdateProfile()
+    return render(request, 'core/signup.html', {'form': form})
 
 
 
@@ -313,6 +300,55 @@ def member_delete(request, pk):
 
 
 
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/')
+    else:
+        form = SignUpForm()
+    return render(request, 'core/signup.html', {'form': form})
+
+
+#
+@login_required
+def edit_user(request):
+
+    args = {}
+
+    if request.method == 'POST':
+        form = UpdateProfile(request.POST, instance=request.user)
+        form.actual_user = request.user
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('update_profile_success'))
+    else:
+        form = UpdateProfile()
+
+    args['form'] = form
+    return render(request, 'core/signup.html', args)
+
+
+
+
+
+class ProfileDetailView(DetailView):
+    model = Profile
+    context = {}
+    template_name = 'core/member_details.html'
+
+
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(ProfileDetailView, self).dispatch(*args, **kwargs)
+
+    def get_queryset(self):
+        return Profile.objects.filter(user__profile__user = Account.pk ) #TODO:
 
 
 
