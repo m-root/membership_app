@@ -12,7 +12,7 @@ A membership App.
 
 ### Edit the settings file by adding your own parameters
 ```
-   SECRET_KEY = ''
+    SECRET_KEY = ''
 
     EMAIL_HOST = ''
     EMAIL_PORT = 587
