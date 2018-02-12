@@ -1,0 +1,14 @@
+<html>
+<title> Email Activation </title>
+<body>
+    <p> Dear {{ user }}</p>
+    <p>Your account has successfully created. Please click below link to activate your account.</p>
+    <p><a href="{{ activate_user_account }}"> Activate your account </a></p>
+</body>
+</html>
+
+{#{% autoescape off %}#}
+{#Hi,#}
+{#Please click on the link to confirm your registration,#}
+{#http://{{ domain }}{% url 'activate' uidb64=uid token=token %}#}
+{#{% endautoescape %}#}

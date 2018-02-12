@@ -2,28 +2,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% block content %}
-
-      <header class="header header-inverse">
-        <div class="container">
-          <div class="header-info">
-            <div class="left">
-              <br>
-              <h2 class="header-title"><strong>Members</strong> <small class="subtitle">You can see list of all members in this page. Use action buttons to make change to them.</small></h2>
-            </div>
-          </div>
-
-          <div class="header-action">
-            <nav class="nav">
-              <a class="nav-link " href="{% url 'core:members' %}">Members</a>
-
-{#              <a class="nav-link active" href="{% url 'core:member_details' %}">Member Details</a>#}
-
-            </nav>
-
-
-          </div>
-        </div>
-      </header><!--/.header -->
+     {% include 'partials/_sub_header.html' %}
 
 <div class="main-content">
     <div class="container">
@@ -41,7 +20,7 @@
                             <div class="form-group col-md-4">
                                 <label class="require">First Name</label>
 {#                                <input class="form-control" type="text" name="name">#}
-                                <p>{{ member.first_name }} </p>
+                                <p>{{ member.email }} </p>
                             </div>
                             <div class="form-group col-md-4">
                                 <label class="require">Middle Name</label>
@@ -52,8 +31,7 @@
 
                             <div class="form-group col-md-4">
                                 <label class="require">Last Name</label>
-{#                                <input class="form-control" type="text" name="slug">#}
-                                <!--<small>String to be use in URL</small>-->
+
                                 <p>{{ member.last_name }}</p>
                             </div>
 
@@ -68,31 +46,27 @@
 
                             <div class="form-group col-md-6">
                                 <label class="require">Sex</label>
-{#                                <select class="form-control" data-provide="selectpicker">#}
-{#                                    <option>Female</option>#}
-{#                                    <option>Male</option>#}
-{#                                </select>#}
                                  <p>{{ member.get_gender_display }}</p>
                             </div>
 
 
                             <div class="form-group col-md-6">
                                 <label class="require">Date of birth</label>
-{#                                <input class="form-control" type="text" name="name">#}
+
                                 <p>{{ member.dob|date }}</p>
                             </div>
                         </div>
-{#                            {% blocktrans %}<hr>{% endblocktrans %}#}
+
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label class="require">School / Zone</label>
-{#                                <input class="form-control" type="text" name="name">#}
+
                                 <p>{{ member.school.name }}</p>
                             </div>
 
                             <div class="form-group col-md-6">
                                 <label class="require">Year Joined Box Girls</label>
-{#                                <input class="form-control" type="text" name="name">#}
+
                                 <p>{{ member.created_at | date }}</p>
                             </div>
 
