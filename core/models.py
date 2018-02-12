@@ -1,28 +1,15 @@
 import json
 
 from django.contrib.auth.tokens import default_token_generator
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-
+from django.core.mail import EmailMessage
 from django.db import models
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.utils.timezone import now, datetime
-from django.utils import timezone
-from django.conf import settings
 from django.db.models.signals import post_save
-
-import json
-import urllib.parse
-import urllib.request
-from africastalking.AfricasTalkingGateway import AfricasTalkingGateway, AfricasTalkingGatewayException
-
-# Create your models here.
-#
-# def get_upload_path(instance, filename):
-#     return 'trap_m/{}/%Y/%m/%d/{}'.format(type(instance),filename)
+from django.utils import timezone
 
 
 class AccountManager(BaseUserManager):
@@ -51,20 +38,17 @@ class AccountManager(BaseUserManager):
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    REQUIRED_FIELDS = []
-    USERNAME_FIELD = 'email'
+
+    """Define a model manager for User model with no username field."""
+
+    use_in_migrations = True
+
 
     objects = AccountManager()
-    # primary email
     email = models.EmailField('email', unique=True, blank=False, null=False)
-    full_name = models.CharField('full_name', blank=True, null=True, max_length=400)
+    full_name = models.CharField('full name', blank=True, null=True, max_length=400)
     is_staff = models.BooleanField('staff status', default=False)
     is_active = models.BooleanField('active', default=True)
-    employee_number = models.CharField(max_length=13,unique=True, null=False)
-    tax_pin = models.CharField('full_name', blank=True, null=True, max_length=400)
-    date_hired = models.DateField('full_name', blank=True, null=True, max_length=400)
-    id_number = models.ImageField('full_name', blank=True, null=True, max_length=400)
-    id_scan = models.ImageField(upload_to='ggg') #TODO: Uploading to the specific field
 
     ADMIN= 1
     EMPLOYEE = 2
@@ -76,12 +60,10 @@ class Account(AbstractBaseUser, PermissionsMixin):
         (EMPLOYEE, 'Employee'),
 
     )
-
-    account_type = models.IntegerField(default=-1, choices=ACCESS_LEVELS)
+    account_type = models.IntegerField(default=2, choices=ACCESS_LEVELS)
     account_profile = models.IntegerField(null=True)
-
-    # is_verified = models.BooleanField('verified', default=False)
-    # verification_uuid = models.UUIDField('Unique Verification UUID', default=uuid.uuid4)
+    REQUIRED_FIELDS = []
+    USERNAME_FIELD = 'email'
 
     def get_short_name(self):
         return self.email
@@ -90,17 +72,29 @@ class Account(AbstractBaseUser, PermissionsMixin):
         return self.full_name
 
 
-    def get_phone_number(self):
-        return self.employee_number
 
     def __unicode__(self):
         return self.email
 
 
 
+class Profile(models.Model):
+    user = models.ManyToManyField(Account)
+    employee_phone_number = models.IntegerField(max_length=13, null=True)
+    tax_pin = models.CharField('tax pin', max_length=40, blank=True, null=True, )
+    date_hired = models.DateTimeField(default=timezone.now())
+    id_number = models.IntegerField(blank=True, null=True, max_length=40)
+    id_scan = models.ImageField(upload_to='media_root/uploads/', blank=True,null=True, )
+    '''
+    # TODO: Uploading to the specific field
+    '''
+
+def get_phone_number(self):
+    return self.employee_phone_number
+
+
+
 @receiver(post_save, sender=Account)
-# @receiver(post_save, sender=Account)
-# def update_user_profile(sender, instance, created, **kwargs):
 def update_user_profile(sender, instance, created, **kwargs):
     if created:
         subject = 'Activate Your Feedback Account'
@@ -113,179 +107,9 @@ def update_user_profile(sender, instance, created, **kwargs):
 
 
 
-
-        instance.email_user(subject, message, from_email='no-reply@mail.feedback.com')
-
-
-        # url_to_shorten = message.
-
-
-
-
-
-
-
-
-
-
-
-def get_user_name():
-    return settings.AFRICASTALKING_USERNAME
-
-
-def get_api_key():
-    return settings.AFRICASTALKING_APIKEY
-
-
-# def get_sender():
-#     return settings.AFRICASTALKING_SENDER
-
-
-# Create your models here.
-
-
-
-
-class GooglException(Exception):
-    def __init__(self, message, code, errors):
-        super().__init__(message)
-        self.code = code
-        self.errors = errors
-
-
-def shortenURL(url_to_shorten):
-    """
-    Given a URL, return a goo.gl shortened URL
-    Arguments
-    ---------
-        url_to_shorten : string
-            The URL you want to shorten
-    Returns
-    -------
-        Shortened goo.gl URL string
-    Raises
-    ------
-        GooglException
-            If something goes wrong with the HTTP request
-    """
-
-    # The goo.gl API URL
-    api_url = 'https://www.googleapis.com/urlshortener/v1/url'
-    # Construct our JSON dictionary
-    data = json.JSONEncoder().encode({'longUrl': url_to_shorten})
-    # Encode to UTF-8 for sending
-    data = data.encode('utf-8')
-    # HTTP header
-    headers = {"Content-Type": "application/json"}
-    # Construct the request
-    request = urllib.request.Request(api_url, data=data, headers=headers)
-
-    # Make the request and get the response to read from
-    try:
-        response = urllib.request.urlopen(request)
-        success = True
-    # If a HTTPError occurs, we will be reading from the error instead
-    except urllib.error.HTTPError as err:
-        response = err
-        success = False
-    # Read the response object, decode from utf-8 and convert from JSON
-    finally:
-        data = json.loads(response.read().decode('utf8'))
-
-    # Return our shortened URL
-    if success:
-        return data['id']
-    # Or raise an Exception
-    else:
-        raise GooglException(data['error']['message'], data['error']['code'], data['error']['errors'])
-
-
-class SendSMS(object):
-    pass
-
-
-class Message(models.Model):
-    text = models.TextField()
-    send_time = models.DateTimeField(auto_now=True)
-
-
-
-    def send(self):
-        # Sending Messages using sender id/short code
-        # message_x = self.message()
-        # api_credentials,created = api_gateway_settings.objects.get_or_create()
-        username = get_user_name()
-        apikey = get_api_key()
-        contacts = Account.employee_number
-
-        if not contacts.exists():
-            # contacts = Contact.objects.filter(sendsms__message=self, sendsms__status=SendSMS.FAILED)
-            print('Contact Does not exist')
-
-        if not contacts:
-            return
-
-        to = ','.join(contacts.values_list('number',flat=True))
-        # message = message_x
-        # Specify your AfricasTalking shortCode or sender id
-        # sender = api_credentials.sender
-        gateway = AfricasTalkingGateway(username, apikey)
-
-        try:
-            results = gateway.sendMessage(to, self.text)
-            # results = gateway.sendMessage(to, self.text, sender)
-            for recipient in results:
-                number = recipient['number']
-                status = recipient['status']
-                message_id = recipient['messageId']
-                cost = recipient['cost']
-
-                employee_number = Account.objects.get(number=number)
-                send_sms = SendSMS.objects.get(message=self,recipient=employee_number)
-
-                if status == 'Success': # and cost != 0:
-                    send_sms.status = 1
-                    send_sms.reference = message_id
-                    send_sms.cost = cost
-                    # send_sms.sent_time = now
-                else:
-                    send_sms.status = 2
-
-                send_sms.save()
-
-                # Note that only the Status "Success" means the message was sent
-                print('number=%s;status=%s;messageId=%s;cost=%s' % (
-                    recipient['number'],
-                    recipient['status'],
-                    recipient['messageId'],
-                    recipient['cost']))
-
-        except AfricasTalkingGatewayException as e:
-            print ('Encountered an error while sending: %s' % str(e))
-
-    def __str__(self):
-        return self.text
-
-    # class Meta:
-    #     ordering = ['-id']
-
-# class SendSMS(models.Model):
-#     WAITTING = 0
-#     FAILED = 2
-#
-#     SEND_STATUS = (
-#         (0,'WAITTING'),
-#         (1,'SENT'),
-#         (2,'FAILED'),
-#     )
-#
-#     recipient = models.ForeignKey(Account.get_phone_number, on_delete=models.CASCADE)
-#     status = models.IntegerField(choices=SEND_STATUS,default=0)
-#     message = models.ForeignKey(Message, on_delete=models.CASCADE)
-#
-#     # sent_time = models.DateTimeField(default=now)
-#     reference = models.CharField(max_length=50, blank=True, default='')
-#     cost = models.CharField(max_length=50, blank=True, default='')
-#
+        # instance.email(subject, message, from_email='no-reply@mail.feedback.com')
+        mail = Account.get_full_name
+        email = EmailMessage(subject, message, to=[mail])
+        email.send()
 
 
