@@ -19,6 +19,7 @@ urlpatterns = [
         },
         name='password_reset'
         ),
+    url(r'^logout/$', web.LogoutView.as_view(), name='logout'),
     url(r'^password_reset/done/$',
         auth_views.password_reset_done,
         {'template_name': 'core/registration/password_reset_done.html'},

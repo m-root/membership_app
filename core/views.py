@@ -241,9 +241,9 @@ def member_list(request):
 @login_required
 def index(request):
     if not Account.is_staff:
-        return render(request,'web/index.html')
+        return render(request, 'core/member_details.html')
     else:
-        return render(request,'core/member_details.html')
+        return render(request, 'web/index.html')
 
 
 ###########################################################
