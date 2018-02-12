@@ -53,7 +53,10 @@ A membership App.
 
 
 
-# For running background tasks using celery like sending emails, converting url using google url services and sms with the help of REDIS or RabbitMQ #TODO: Running the requests using celery from the background
+# For running background tasks using celery
+
+For running background tasks using celery like sending emails, converting url using google url services and sms with the help of REDIS or RabbitMQ #TODO: Running the requests using celery from the background
+
 ### Start celery beat
 ```
     celery -A payload beat --loglevel=INFO
