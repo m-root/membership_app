@@ -9,7 +9,7 @@ django-sendgrid-webhook==0.3.0
 exception==0.1.0
 idna==2.6
 kombu==4.1.0
-Pillow==5.0.0
+Pillow==8.2.0
 python-http-client==3.0.0
 pytz==2018.3
 requests==2.18.4
